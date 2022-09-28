@@ -54,7 +54,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
 
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+
 
 
 class User(AbstractEmailUser):
@@ -63,7 +63,6 @@ class User(AbstractEmailUser):
         'Full name', max_length=255, blank=True
     )
 
-    activation_code = models.CharField(max_length=50, null=True)
 
     def get_full_name(self):
         return self.full_name
@@ -77,7 +76,6 @@ class User(AbstractEmailUser):
             email=self.email
         )
 
-    def create_activation_code(self):
-        self.activation_code = str(uuid.uuid4())
+
 
 

@@ -2,7 +2,7 @@ from django.db.migrations import serializer
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model, authenticate
-from .send_email import send_code_email
+
 
 User = get_user_model()
 
@@ -40,7 +40,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user.create_activation_code()
         user.set_password(password)
         user.save()
-        send_code_email(user)
         return user
 
 class LoginSerializer(serializers.Serializer):
