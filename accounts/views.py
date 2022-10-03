@@ -2,18 +2,22 @@ from django.shortcuts import render
 from django.views import View
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, response
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
-# from rest_framework_simplejwt.views import TokenObtainPairView
-
 from .serializers import UserRegisterSerializer, LoginSerializer
-# from .serializers_jwt import LoginJWTSerializer
 from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
 
 class UserRegisterAPIView(APIView):
+
+    def get(self, request, format=None):
+        users = User.objects.all()
+        serializer = UserRegisterSerializer(users, many=True)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -24,6 +28,11 @@ class UserRegisterAPIView(APIView):
 class LoginAPIView(APIView):
     permission_classes = [AllowAny,]
     serializer_class = LoginSerializer
+
+    def get(self, request, email, format=None):
+        users = User.objects.all()
+        serializer = LoginSerializer(users)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

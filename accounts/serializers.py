@@ -44,7 +44,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(min_length=6, write_only=True)
+    password = serializers.CharField(min_length=3, write_only=True)
     token = serializers.CharField(read_only=True)
 
     def validate(self, attrs):
@@ -61,7 +61,7 @@ class LoginSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data.get('email')
         password = validated_data.get('password')
-        user = User.objects.get(email=email, password=password)
+        user = authenticate(email=email, password=password)
         if user is None:
             raise serializers.ValidationError('User not found')
         if not user.is_active:

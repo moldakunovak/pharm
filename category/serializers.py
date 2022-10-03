@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        if instance.category_set.exists():
+        if instance.sub_categoryies.exists():
             representation['child'] = CategorySerializer(
                 instance.category_set.all(), many=True
             ).data
