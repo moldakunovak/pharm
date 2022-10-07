@@ -17,7 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'created_at', 'updated_at',)
+        fields = ('id', 'name', 'description', 'price', 'created_at', 'updated_at', 'image',)
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -34,28 +34,36 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     """Serializer для заказа."""
-
-    creator = UserSerializer(read_only=True)
     positions = ItemSerializer(many=True)
 
     class Meta:
         model = Order
-        fields = ('id', 'creator', 'positions', 'status', 'total_price', 'created_at', 'updated_at',)
+        fields = ('id', 'positions', 'status', 'total_price', 'created_at', 'updated_at')
 
     def create(self, validated_data):
         """Метод создания заказа"""
         validated_data["creator"] = self.context["request"].user
         positions_data = validated_data.pop('positions')
-        order = super().create(validated_data)
-
+        print(positions_data)
+        order = Order.objects.create(**validated_data)
+        total_summ = 0
+        total_items = 0
         raw_positions = []
         for position in positions_data:
-            position = Item(order=order,
-                            product=position["product"],
+            total_summ += position["product"].price
+            total_items += position["quantity"]
+            print(position["product"].price)
+
+            positions = Item(order=order,
+                            product=position['product'],
                             quantity=position["quantity"],
-                            price=position["product"].price)
-            raw_positions.append(position)
+                            price=position['product'].price)
+            raw_positions.append(positions)
+
         Item.objects.bulk_create(raw_positions)
+        order.total_price = total_summ
+        order.total_items = total_items
+        order.save()
         return order
 
     def update(self, instance, validated_data):

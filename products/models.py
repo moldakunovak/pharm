@@ -1,18 +1,21 @@
 from django.conf import settings
 from django.db import models
 
+from category.models import Category
+
 
 class Product(models.Model):
     """Товар."""
     name = models.CharField(verbose_name='Title', max_length=128)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='products')
     description = models.TextField(default='')
     price = models.DecimalField(decimal_places=2, max_digits=10)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='post_image', max_length=255)
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 
 class OrderStatusChoices(models.TextChoices):
@@ -26,17 +29,16 @@ class OrderStatusChoices(models.TextChoices):
 class Order(models.Model):
     """Заказ."""
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
-    products = models.ManyToManyField(Product, through='Item')
     status = models.TextField(choices=OrderStatusChoices.choices, default=OrderStatusChoices.NEW)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     total_items = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        self.total_price = sum(item.get_cost() for item in self.positions.all())
-        self.total_items = sum(item.quantity for item in self.positions.all())
-        super(Order, self).save(*args, **kwargs)
+    #
+    # def save(self, *args, **kwargs):
+    #     self.total_price = sum(item.get_cost() for item in self.positions.all())
+    #     self.total_items = sum(item.quantity for item in self.positions.all())
+    #     super(Order, self).save(*args, **kwargs)
 
 
 class Item(models.Model):

@@ -76,6 +76,3 @@ class User(AbstractEmailUser):
             email=self.email
         )
 
-
-
-

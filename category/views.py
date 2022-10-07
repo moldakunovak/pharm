@@ -15,12 +15,12 @@ class CreateCategoryAPIView(CreateAPIView):
 
 class CategoryListAPIView(ListAPIView):
     permission_classes = [IsSuperUserOrReadOnly]
-    # queryset = Category.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    def get_queryset(self):
-        queryset = Category.objects.filter(sub_category=None)
-        return queryset
+    # def get_queryset(self):
+    #     queryset = Category.objects
+    #     return queryset
 
 
 class CategoryRUDAPIView(RetrieveUpdateDestroyAPIView):

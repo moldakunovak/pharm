@@ -43,6 +43,11 @@ class OrderViewSet(ModelViewSet):
             return [IsOwnerOrAdmin()]
         return []
 
+    def get_serializer_context(self):
+        return {
+            "request": self.request
+        }
+
 class ReviweViewSet(ModelViewSet):
     """ViewSet для отзывов."""
     queryset = Review.objects.all()
